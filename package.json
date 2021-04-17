@@ -1,0 +1,27 @@
+{
+  "name": "twitter-back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zionjke/twitter-back",
+  "author": "zionjke <vincere802@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.11",
+    "@types/nodemailer": "^6.4.1",
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.10.0",
+    "mongoose": "^5.12.4",
+    "nodemailer": "^6.5.0",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "ts-node server.ts",
+    "nodemon": "nodemon"
+  }
+}
