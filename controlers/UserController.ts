@@ -1,9 +1,13 @@
 import express from "express";
+import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken';
 
-import {UserModel, UserModelInterface} from "../models/UserModel";
+import {UserModel, UserModelDocumentInterface, UserModelInterface} from "../models/UserModel";
 import {validationResult} from "express-validator";
 import {generateMD5} from "../utils/generateHash";
 import {sendEmail} from "../utils/sendEmail";
+
+const isValidObjectId = mongoose.Types.ObjectId.isValid; // проверка на корректный ID
 
 class UserController {
     async index(_: any, res: express.Response): Promise<void> {
@@ -35,7 +39,7 @@ class UserController {
                 email: req.body.email,
                 username: req.body.username,
                 fullname: req.body.fullname,
-                password: req.body.password,
+                password: generateMD5(req.body.password + process.env.SECRET_KEY),
                 confirmHash: generateMD5(process.env.SECRET_KEY || Math.random().toString())
             }
 
@@ -88,7 +92,7 @@ class UserController {
                     status: 'success'
                 })
             } else {
-                res.status(404).send({status:'error',message:'Пользователь не найден'})
+                res.status(404).send({status: 'error', message: 'Пользователь не найден'})
             }
 
         } catch (error) {
@@ -98,6 +102,71 @@ class UserController {
             });
 
         }
+    }
+
+    async show(req: any, res: express.Response): Promise<void> {
+        try {
+            const userId = req.params.id
+            if(!isValidObjectId(userId)) {
+                res.status(400).send();
+                return;
+            }
+            const user = await UserModel.findById(userId).exec()
+
+            if(!user) {
+                res.status(404).send();
+                return;
+            }
+
+            res.json({
+                status: 'success',
+                data: user
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error,
+            });
+
+        }
+    }
+
+    async afterLogin(req: any, res: express.Response): Promise<void> {
+        try {
+            const user = req.user ? (req.user as UserModelDocumentInterface).toJSON() : undefined;
+            res.json({
+                status: 'success',
+                data: {
+                    ...user,
+                    token: jwt.sign({ data: req.user }, process.env.SECRET_KEY || '123', {
+                        expiresIn: '30 days',
+                    }),
+                },
+            });
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error,
+            });
+        }
+
+    }
+
+    async getUserInfo(req: any, res: express.Response): Promise<void> {
+        try {
+            const user = req.user ? (req.user as UserModelDocumentInterface).toJSON() : undefined;
+            res.json({
+                status: 'success',
+                data: user
+            })
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: error,
+            });
+        }
+
     }
 }
 

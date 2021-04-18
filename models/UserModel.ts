@@ -37,7 +37,7 @@ const UserSchema = new Schema({
     },
     password: {
         required: true,
-        type: String
+        type: String,
     },
     confirmed: {
         type:Boolean,
@@ -45,11 +45,21 @@ const UserSchema = new Schema({
     },
     confirmHash: {
         required: true,
-        type: String
+        type: String,
     },
     about: String,
     website:String
 })
+
+//Скрывает свойства в обьекте при запросе
+UserSchema.set('toJSON', {
+    transform: function (_:any, obj:any) {
+        delete obj.password;
+        delete obj.confirmHash;
+        return obj;
+    },
+});
+
 
 
 
