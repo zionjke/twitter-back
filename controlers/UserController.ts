@@ -1,13 +1,13 @@
 import express from "express";
-import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken';
 
 import {UserModel, UserModelDocumentInterface, UserModelInterface} from "../models/UserModel";
 import {validationResult} from "express-validator";
 import {generateMD5} from "../utils/generateHash";
 import {sendEmail} from "../utils/sendEmail";
+import {isValidObjectId} from "../utils/isValidObjectId";
 
-const isValidObjectId = mongoose.Types.ObjectId.isValid; // проверка на корректный ID
+
 
 class UserController {
     async index(_: any, res: express.Response): Promise<void> {

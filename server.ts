@@ -9,6 +9,8 @@ import express from 'express'
 import {UserCtrl} from "./controlers/UserController";
 import {registerValidations} from "./validations/register";
 import {passport} from "./core/passport";
+import {TweetsCtrl} from "./controlers/TweetsController";
+import {createTweetValidations} from "./validations/createTweet";
 
 
 const app = express()
@@ -22,8 +24,14 @@ app.get('/hello', (_, res: express.Response) => {
 })
 
 app.get('/users', UserCtrl.index);
-app.get('/users/me', passport.authenticate('jwt', { session: false }), UserCtrl.getUserInfo);
+app.get('/users/me', passport.authenticate('jwt', {session: false}), UserCtrl.getUserInfo);
 app.get('/users/:id', UserCtrl.show);
+
+app.get('/tweets', TweetsCtrl.index);
+app.get('/tweets/:id', TweetsCtrl.show);
+app.post('/tweets', passport.authenticate('jwt'), createTweetValidations, TweetsCtrl.create)
+app.delete('/tweets/:id', passport.authenticate('jwt'), TweetsCtrl.delete);
+app.patch('/tweets/:id', passport.authenticate('jwt'), createTweetValidations, TweetsCtrl.update);
 
 
 app.post('/auth/register', registerValidations, UserCtrl.create);
